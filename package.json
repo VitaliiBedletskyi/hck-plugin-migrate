@@ -1,0 +1,22 @@
+{
+  "name": "hck-plugin-migrate",
+  "version": "0.0.1",
+  "description": "",
+  "bin": {
+    "hck-plugin-migrate": "./bin/prettier.js"
+  },
+  "scripts": {
+    "start": "node ./dist/bin/hck-plugin-migrate.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VitaliiBedletskyi/hck-plugin-migrate.git"
+  },
+  "author": "Vitalii Bedletskyi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/VitaliiBedletskyi/hck-plugin-migrate/issues"
+  },
+  "homepage": "https://github.com/VitaliiBedletskyi/hck-plugin-migrate#readme"
+}
