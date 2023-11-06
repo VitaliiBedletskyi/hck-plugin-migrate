@@ -1,7 +1,7 @@
 const path = require('node:path')
 const fs = require('node:fs')
 const {readJsonFile, writeJsonFile, remove} = require("./fsClient");
-const {runCommand} = require("./util");
+const {runCommand, log} = require("./util");
 const {cp} = require("fs/promises");
 
 const PACKAGE_JSON_FILE_NAME = 'package.json';
@@ -11,18 +11,18 @@ const NODE_MODULES_FOLDER_NAME = 'node_modules';
 const run = async () => {
 	const pluginRepoPath = path.resolve(process.argv[3] || '.');
 
-	console.log('Moving all dependencies to root package.json file and add additional configs');
+	log.info('Moving all dependencies to root package.json file and add additional configs');
 	await fillRootPackageJson(pluginRepoPath);
 
-	console.log('Removing node_modules from FE and RE folders');
+	log.info('Removing node_modules from FE and RE folders');
 	await remove(path.join(pluginRepoPath, 'forward_engineering', NODE_MODULES_FOLDER_NAME));
 	await remove(path.join(pluginRepoPath, 'reverse_engineering', NODE_MODULES_FOLDER_NAME));
 
-	console.log('Removing package-lock.json if exists from FE and RE folders');
+	log.info('Removing package-lock.json if exists from FE and RE folders');
 	await remove(path.join(pluginRepoPath, 'forward_engineering', PACKAGE_LOCK_JSON_FILE_NAME));
 	await remove(path.join(pluginRepoPath, 'reverse_engineering', PACKAGE_LOCK_JSON_FILE_NAME));
 
-	console.log('Installing dev dependencies')
+	log.info('Installing dev dependencies')
 	const installDevDepsCommand = 'npm i -D --save-exact esbuild esbuild-plugin-clean eslint eslint-config-prettier eslint-plugin-prettier lint-staged@14.0.1 prettier simple-git-hooks @hackolade/hck-esbuild-plugins-pack'
 	const installDeps = runCommand(installDevDepsCommand);
 
@@ -30,26 +30,26 @@ const run = async () => {
 		process.exit(-1);
 	}
 
-	console.log('Installing git hooks')
+	log.info('Installing git hooks')
 	const installGitHooks = runCommand('npx simple-git-hooks');
 
 	if (!installGitHooks) {
 		process.exit(-1);
 	}
 
-	console.log('Copying required configs to plugin repository')
+	log.info('Copying required configs to plugin repository')
 	await cp(path.resolve(__dirname, '..', 'required_configs'), pluginRepoPath, {recursive: true});
 
-	console.log('Running prettier for JSON files')
+	log.info('Running prettier for JSON files')
 	runCommand('npx prettier ./**/*.json --write');
 
-	console.log('Running prettier for JS files')
+	log.info('Running prettier for JS files')
 	runCommand('npx prettier ./**/*.js --write');
 
-	console.log('Running ESLint');
+	log.info('Running ESLint');
 	runCommand('npm run lint');
 
-	console.log('Migration successfully finished');
+	log.success('Migration successfully finished!!! 💪');
 };
 
 const fixPackageVersion = (version) => {
