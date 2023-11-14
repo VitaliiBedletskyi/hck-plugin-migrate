@@ -40,11 +40,8 @@ const run = async () => {
 	log.info('Copying required configs to plugin repository')
 	await cp(path.resolve(__dirname, '..', 'required_configs'), pluginRepoPath, {recursive: true});
 
-	log.info('Running prettier for JSON files')
-	runCommand('npx prettier ./**/*.json --write');
-
-	log.info('Running prettier for JS files')
-	runCommand('npx prettier ./**/*.js --write');
+	log.info('Running prettier for JS and JSON files')
+	runCommand('npx prettier "./**/*.{js,json}" --write');
 
 	log.info('Running ESLint');
 	runCommand('npm run lint');
@@ -116,15 +113,29 @@ const fillRootPackageJsonByAdditionalConfigs = (rootPackageJsonConfig) => {
 	}
 };
 
+const getBumpedVersion = (version = '') => {
+	const versionParts = version.split('.');
+	const major = parseInt(versionParts[0]);
+	const minor = parseInt(versionParts[1]);
+	const patch = parseInt(versionParts[2]) + 1;
+	return `${major}.${minor}.${patch}`;
+}
+
+const bumpPluginPatchVersion = (packageJsonConfig) => {
+	return {
+		...packageJsonConfig,
+		version: getBumpedVersion(packageJsonConfig.version),
+	}
+}
+
 const fillRootPackageJson = async (pluginRepoPath) => {
 	const rootPackageJsonPath = path.join(pluginRepoPath, PACKAGE_JSON_FILE_NAME);
 	const rootPackageJsonConfig = await readJsonFile(rootPackageJsonPath);
 
-
 	const packageJsonWithDependencies = await fillRootPackageJsonByDependencies(pluginRepoPath, rootPackageJsonConfig);
 	const resultPackageJsonConfig = fillRootPackageJsonByAdditionalConfigs(packageJsonWithDependencies);
 
-	await writeJsonFile(rootPackageJsonPath, resultPackageJsonConfig);
+	await writeJsonFile(rootPackageJsonPath, bumpPluginPatchVersion(resultPackageJsonConfig));
 };
 
 module.exports = {
