@@ -2,7 +2,7 @@ const path = require('node:path')
 const fs = require('node:fs')
 const {readJsonFile, writeJsonFile, remove} = require("./fsClient");
 const {runCommand, log} = require("./util");
-const {cp} = require("fs/promises");
+const {cp, rename} = require("fs/promises");
 
 const PACKAGE_JSON_FILE_NAME = 'package.json';
 const PACKAGE_LOCK_JSON_FILE_NAME = 'package-lock.json';
@@ -38,8 +38,10 @@ const run = async () => {
 	}
 
 	log.info('Copying required configs to plugin repository')
-	const fileIgnoreFilter = (src) => path.basename(src) !== '.npmignore';
-	await cp(path.resolve(__dirname, '..', 'required_configs'), pluginRepoPath, {recursive: true, force: true, filter: fileIgnoreFilter});
+	await cp(path.resolve(__dirname, '..', 'required_configs'), pluginRepoPath, {recursive: true, force: true});
+
+	log.info('Renaming file: gitignore -> .gitignore')
+	await rename(path.join(pluginRepoPath, 'gitignore'), path.join(pluginRepoPath, '.gitignore'));
 
 	log.info('Running prettier for JS and JSON files')
 	runCommand('npx prettier "./**/*.{js,json}" --write');
