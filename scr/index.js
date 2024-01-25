@@ -38,7 +38,8 @@ const run = async () => {
 	}
 
 	log.info('Copying required configs to plugin repository')
-	await cp(path.resolve(__dirname, '..', 'required_configs'), pluginRepoPath, {recursive: true, force: true});
+	const fileIgnoreFilter = (src) => path.basename(src) !== '.npmignore';
+	await cp(path.resolve(__dirname, '..', 'required_configs'), pluginRepoPath, {recursive: true, force: true, filter: fileIgnoreFilter});
 
 	log.info('Running prettier for JS and JSON files')
 	runCommand('npx prettier "./**/*.{js,json}" --write');
