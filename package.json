@@ -1,6 +1,6 @@
 {
   "name": "hck-plugin-migrate",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Simple migration tool to automate some steps of adapting plugin source code for the new build process.",
   "bin": "./bin/hck-plugin-migrate.js",
   "scripts": {
