@@ -38,7 +38,7 @@ const run = async () => {
 	}
 
 	log.info('Copying required configs to plugin repository')
-	await cp(path.resolve(__dirname, '..', 'required_configs'), pluginRepoPath, {recursive: true});
+	await cp(path.resolve(__dirname, '..', 'required_configs'), pluginRepoPath, {recursive: true, force: true});
 
 	log.info('Running prettier for JS and JSON files')
 	runCommand('npx prettier "./**/*.{js,json}" --write');
